@@ -83,7 +83,7 @@ const timelineData = {
 // DOM yüklendikten sonra çalışacak şekilde düzenleyelim
 document.addEventListener('DOMContentLoaded', function() {
     // DOM elementlerini seçme
-    const timelineButtons = document.querySelectorAll('.timeline button');
+    const timelineButtons = document.querySelectorAll('.timeline-btn');
     const mapContainer = document.getElementById('map');
     const infoPanel = document.querySelector('.info-panel');
     const modelModal = document.getElementById('modelModal');
@@ -92,44 +92,56 @@ document.addEventListener('DOMContentLoaded', function() {
     const view3DButton = document.getElementById('view3DButton');
     const stateName = document.getElementById('stateName');
     const wikiFrame = document.getElementById('wikiFrame');
-    const zoomInBtn = document.getElementById('zoomIn');
-    const zoomOutBtn = document.getElementById('zoomOut');
 
     // Varsayılan yılı ayarla ve haritayı yükle
     const defaultYear = '1100AD';
-    const defaultButton = document.querySelector(`[data-year="${defaultYear}"]`);
-    if (defaultButton) {
-        defaultButton.classList.add('active');
-        loadMap(defaultYear);
-        updateTimelineInfo(defaultYear);
-        setupMapInteraction(defaultYear);
-    }
-
+    loadMap(defaultYear);
+    
     // Timeline butonlarına tıklama olayını ekle
     timelineButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const year = this.dataset.year;
-            document.querySelector('.timeline button.active')?.classList.remove('active');
+            const year = this.getAttribute('data-year');
+            // Aktif butonu güncelle
+            timelineButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
+            
+            // Haritayı güncelle
             loadMap(year);
-            updateTimelineInfo(year);
-            setupMapInteraction(year);
         });
     });
 
     // Bilgi panelini kapatma
     if (infoCloseButton) {
         infoCloseButton.addEventListener('click', function() {
-            infoPanel.classList.remove('active');
-            if (wikiFrame) wikiFrame.src = '';
+            if (infoPanel) {
+                infoPanel.classList.remove('active');
+                if (wikiFrame) {
+                    wikiFrame.src = 'about:blank';
+                }
+            }
         });
     }
+
+    // Harita dışı tıklamaları dinle
+    document.addEventListener('click', function(e) {
+        // Eğer tıklanan element harita veya bilgi paneli değilse
+        if (!e.target.closest('#map') && !e.target.closest('.info-panel')) {
+            // Bilgi panelini kapat
+            if (infoPanel) {
+                infoPanel.classList.remove('active');
+                if (wikiFrame) {
+                    wikiFrame.src = 'about:blank';
+                }
+            }
+        }
+    });
 
     // 3D model görüntüleme
     if (view3DButton) {
         view3DButton.addEventListener('click', function() {
             if (activeState && modelModal) {
-                const modelPath = mapData[getCurrentYear()].states[activeState].coinModel;
+                const currentYear = document.querySelector('.timeline-btn.active').getAttribute('data-year');
+                const modelPath = mapData[currentYear].states[activeState].coinModel;
                 modelModal.style.display = 'block';
                 init3DViewer();
                 loadModel(modelPath);
@@ -139,8 +151,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modal kapatma
     closeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const modal = button.closest('.modal');
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
             if (modal) {
                 modal.style.display = 'none';
                 if (renderer) {
@@ -150,40 +162,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    // ESC tuşu ile modalı kapatma
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modelModal) {
-            modelModal.style.display = 'none';
-            if (renderer) {
-                renderer.dispose();
-                document.getElementById('model-viewer').innerHTML = '';
-            }
-        }
-    });
-
-    // Zoom kontrolleri
-    if (zoomInBtn) {
-        zoomInBtn.addEventListener('click', function() {
-            if (camera) camera.position.z *= 0.9;
-        });
-    }
-
-    if (zoomOutBtn) {
-        zoomOutBtn.addEventListener('click', function() {
-            if (camera) camera.position.z *= 1.1;
-        });
-    }
 });
 
 // Harita yükleme fonksiyonu
 function loadMap(year) {
-    console.log('Harita yükleniyor:', year); // Debug için log
     const mapImage = document.querySelector('#map img');
     if (mapImage) {
-        mapImage.src = `./maps/${year}.png`; // ./ eklendi
+        mapImage.src = `./maps/${year}.png`;
         mapImage.onload = () => {
-            console.log('Harita yüklendi'); // Debug için log
             setupMapInteraction(year);
         };
     }
@@ -191,42 +177,30 @@ function loadMap(year) {
 
 // Harita etkileşimini kurma
 function setupMapInteraction(year) {
-    console.log('Harita etkileşimi kuruluyor:', year); // Debug için log
-    const mapContainer = document.querySelector('.map-container');
+    const mapContainer = document.querySelector('#map');
     const mapImage = mapContainer.querySelector('img');
 
-    if (!mapContainer || !mapImage) {
-        console.error('Harita elementleri bulunamadı');
-        return;
-    }
+    if (!mapContainer || !mapImage) return;
 
     // Önceki event listener'ları temizle
-    const newMapContainer = mapContainer.cloneNode(true);
-    mapContainer.parentNode.replaceChild(newMapContainer, mapContainer);
-    
-    const newMapImage = newMapContainer.querySelector('img');
+    mapImage.replaceWith(mapImage.cloneNode(true));
+    const newMapImage = mapContainer.querySelector('img');
 
     newMapImage.addEventListener('click', function(e) {
-        const rect = newMapImage.getBoundingClientRect();
+        const rect = this.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        const scaleX = newMapImage.naturalWidth / rect.width;
-        const scaleY = newMapImage.naturalHeight / rect.height;
+        const scaleX = this.naturalWidth / rect.width;
+        const scaleY = this.naturalHeight / rect.height;
         
         const actualX = Math.round(x * scaleX);
         const actualY = Math.round(y * scaleY);
 
-        console.log('Tıklanan koordinatlar:', actualX, actualY);
-
         const states = mapData[year].states;
-        let clicked = false;
-
         for (const [stateName, stateData] of Object.entries(states)) {
             if (stateData.coordinates && isPointInState(actualX, actualY, stateData.coordinates)) {
-                console.log('Devlet bulundu:', stateName);
                 showStateInfo(stateName, stateData);
-                clicked = true;
                 break;
             }
         }
@@ -262,26 +236,18 @@ function isPointInPolygon(x, y, vertices) {
     return inside;
 }
 
+// Devlet bilgilerini gösterme
 function showStateInfo(name, data) {
     const infoPanel = document.querySelector('.info-panel');
     const stateName = document.getElementById('stateName');
     const wikiFrame = document.getElementById('wikiFrame');
-    const view3DButton = document.getElementById('view3DButton');
     
-    // Devlet adını ve Wikipedia sayfasını güncelle
-    stateName.textContent = name;
-    wikiFrame.src = data.wikiUrl;
-    
-    // 3D model butonu varsa ve coin modeli tanımlıysa göster
-    if (view3DButton && data.coinModel) {
-        view3DButton.style.display = 'block';
-        activeState = name; // Aktif devleti kaydet
-    } else if (view3DButton) {
-        view3DButton.style.display = 'none';
+    if (infoPanel && stateName && wikiFrame) {
+        stateName.textContent = name;
+        wikiFrame.src = data.wikiUrl;
+        activeState = name;
+        infoPanel.classList.add('active');
     }
-    
-    // Bilgi panelini göster
-    infoPanel.classList.add('active');
 }
 
 // 3D viewer başlatma
