@@ -80,79 +80,97 @@ const timelineData = {
     }
 };
 
-// DOM elementlerini seçme
-const timelineButtons = document.querySelectorAll('.timeline button');
-const mapContainer = document.getElementById('map');
-const infoPanel = document.querySelector('.info-panel');
-const modelModal = document.getElementById('modelModal');
-const closeButtons = document.querySelectorAll('.close');
-const infoCloseButton = document.querySelector('.info-close');
-const view3DButton = document.getElementById('view3DButton');
-const stateName = document.getElementById('stateName');
-const wikiFrame = document.getElementById('wikiFrame');
-const zoomInBtn = document.getElementById('zoomIn');
-const zoomOutBtn = document.getElementById('zoomOut');
+// DOM yüklendikten sonra çalışacak şekilde düzenleyelim
+document.addEventListener('DOMContentLoaded', function() {
+    // Performans monitörü
+    const stats = new Stats();
+    stats.showPanel(0);
+    document.body.appendChild(stats.dom);
 
-// Three.js değişkenleri
-let scene, camera, renderer, model, controls;
-let mixer, clock;
+    // DOM elementlerini seçme
+    const timelineButtons = document.querySelectorAll('.timeline button');
+    const mapContainer = document.getElementById('map');
+    const infoPanel = document.querySelector('.info-panel');
+    const modelModal = document.getElementById('modelModal');
+    const closeButtons = document.querySelectorAll('.close');
+    const infoCloseButton = document.querySelector('.info-close');
+    const view3DButton = document.getElementById('view3DButton');
+    const stateName = document.getElementById('stateName');
+    const wikiFrame = document.getElementById('wikiFrame');
+    const zoomInBtn = document.getElementById('zoomIn');
+    const zoomOutBtn = document.getElementById('zoomOut');
 
-// Aktif devlet
-let activeState = null;
-
-function updateTimelineInfo(year) {
-    const data = timelineData[year];
-    
-    // Bilgi kutusunu güncelle
-    const infoBox = document.querySelector('.info-box');
-    if (infoBox) {
-        infoBox.querySelector('p').textContent = data.summary;
-    }
-    
-    // Lejantı güncelle
-    const legend = document.querySelector('.legend');
-    if (legend) {
-        legend.innerHTML = data.legend.map(item => `
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: ${item.color}"></div>
-                <span class="legend-text">${item.name}</span>
-            </div>
-        `).join('');
-    }
-}
-
-// Timeline butonlarına tıklama olayını güncelle
-document.querySelectorAll('.timeline button').forEach(button => {
-    button.addEventListener('click', function() {
-        const year = this.dataset.year;
-        // Mevcut aktif butonu kaldır
-        document.querySelector('.timeline button.active')?.classList.remove('active');
-        // Yeni butonu aktif yap
-        this.classList.add('active');
-        
-        // Haritayı güncelle
-        const mapImage = document.querySelector('#map img');
-        mapImage.src = `maps/${year}.png`;
-        
-        // Bilgi kutusu ve lejantı güncelle
-        updateTimelineInfo(year);
-        
-        // Harita etkileşimini güncelle
-        setupMapInteraction(year);
-    });
-});
-
-// Sayfa yüklendiğinde varsayılan zaman dilimini göster
-document.addEventListener('DOMContentLoaded', () => {
+    // Varsayılan yılı ayarla ve haritayı yükle
     const defaultYear = '1100AD';
-    const defaultButton = document.querySelector(`[data-year="${defaultYear}"]`);
-    if (defaultButton) {
-        defaultButton.classList.add('active');
-        const mapImage = document.querySelector('#map img');
-        mapImage.src = `maps/${defaultYear}.png`;
-        updateTimelineInfo(defaultYear);
-        setupMapInteraction(defaultYear);
+    loadMap(defaultYear);
+    updateTimelineInfo(defaultYear);
+    setupMapInteraction(defaultYear);
+
+    // Timeline butonlarına tıklama olayını ekle
+    timelineButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const year = this.dataset.year;
+            document.querySelector('.timeline button.active')?.classList.remove('active');
+            this.classList.add('active');
+            loadMap(year);
+            updateTimelineInfo(year);
+            setupMapInteraction(year);
+        });
+    });
+
+    // Diğer event listener'ları ekle
+    if (infoCloseButton) {
+        infoCloseButton.addEventListener('click', function() {
+            infoPanel.classList.remove('active');
+            if (wikiFrame) wikiFrame.src = '';
+        });
     }
+
+    if (view3DButton) {
+        view3DButton.addEventListener('click', function() {
+            const state = activeState;
+            if (state && modelModal) {
+                const modelPath = mapData[getCurrentYear()].states[state].coinModel;
+                modelModal.style.display = 'block';
+                init3DViewer();
+                loadModel(modelPath);
+            }
+        });
+    }
+
+    // Zoom kontrolleri
+    if (zoomInBtn) {
+        zoomInBtn.addEventListener('click', function() {
+            if (camera) camera.position.z *= 0.9;
+        });
+    }
+
+    if (zoomOutBtn) {
+        zoomOutBtn.addEventListener('click', function() {
+            if (camera) camera.position.z *= 1.1;
+        });
+    }
+
+    // ESC tuşu ile modalı kapatma
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modelModal) {
+            modelModal.style.display = 'none';
+            if (renderer) {
+                renderer.dispose();
+                document.getElementById('model-viewer').innerHTML = '';
+            }
+        }
+    });
+
+    // Pencere boyutu değiştiğinde
+    window.addEventListener('resize', function() {
+        const container = document.getElementById('model-viewer');
+        if (renderer && camera && container) {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+    });
 });
 
 // Harita yükleme fonksiyonu
@@ -283,55 +301,6 @@ function showStateInfo(name, data) {
     // Bilgi panelini göster
     infoPanel.classList.add('active');
 }
-
-// Bilgi panelini kapatma fonksiyonu
-document.querySelector('.info-close').addEventListener('click', function() {
-    const infoPanel = document.querySelector('.info-panel');
-    const wikiFrame = document.getElementById('wikiFrame');
-    
-    infoPanel.classList.remove('active');
-    wikiFrame.src = ''; // iframe'i temizle
-});
-
-// Modal kapatma olayları
-closeButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const modal = button.closest('.modal');
-        if (modal) {
-            modal.style.display = 'none';
-            // 3D viewer'ı temizle
-            if (renderer) {
-                renderer.dispose();
-                document.getElementById('model-viewer').innerHTML = '';
-            }
-        }
-    });
-});
-
-// ESC tuşu ile modalı kapatma
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        const modal = document.querySelector('.modal[style*="display: block"]');
-        if (modal) {
-            modal.style.display = 'none';
-            // 3D viewer'ı temizle
-            if (renderer) {
-                renderer.dispose();
-                document.getElementById('model-viewer').innerHTML = '';
-            }
-        }
-    }
-});
-
-// 3D model görüntüleme butonu olayı
-view3DButton.addEventListener('click', function() {
-    const state = activeState;
-    const modelPath = mapData[getCurrentYear()].states[state].coinModel;
-    
-    modelModal.style.display = 'block';
-    init3DViewer();
-    loadModel(modelPath);
-});
 
 // 3D viewer başlatma
 function init3DViewer() {
@@ -478,15 +447,6 @@ function loadModel(modelPath) {
         alert('Model yükleme işlemi başlatılamadı.');
     }
 }
-
-// Zoom kontrolleri
-zoomInBtn.addEventListener('click', function() {
-    camera.position.z *= 0.9;
-});
-
-zoomOutBtn.addEventListener('click', function() {
-    camera.position.z *= 1.1;
-});
 
 // Aktif yılı alma
 function getCurrentYear() {
