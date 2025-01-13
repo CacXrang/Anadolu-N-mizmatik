@@ -1,7 +1,7 @@
-// Performans monitörü
-const stats = new Stats();
-stats.showPanel(0);
-document.body.appendChild(stats.dom);
+// Three.js değişkenleri
+let scene, camera, renderer, model, controls;
+let mixer, clock;
+let activeState = null;
 
 // Harita verilerini tutacak nesne
 const mapData = {
@@ -82,11 +82,6 @@ const timelineData = {
 
 // DOM yüklendikten sonra çalışacak şekilde düzenleyelim
 document.addEventListener('DOMContentLoaded', function() {
-    // Performans monitörü
-    const stats = new Stats();
-    stats.showPanel(0);
-    document.body.appendChild(stats.dom);
-
     // DOM elementlerini seçme
     const timelineButtons = document.querySelectorAll('.timeline button');
     const mapContainer = document.getElementById('map');
@@ -102,9 +97,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Varsayılan yılı ayarla ve haritayı yükle
     const defaultYear = '1100AD';
-    loadMap(defaultYear);
-    updateTimelineInfo(defaultYear);
-    setupMapInteraction(defaultYear);
+    const defaultButton = document.querySelector(`[data-year="${defaultYear}"]`);
+    if (defaultButton) {
+        defaultButton.classList.add('active');
+        loadMap(defaultYear);
+        updateTimelineInfo(defaultYear);
+        setupMapInteraction(defaultYear);
+    }
 
     // Timeline butonlarına tıklama olayını ekle
     timelineButtons.forEach(button => {
@@ -118,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Diğer event listener'ları ekle
+    // Bilgi panelini kapatma
     if (infoCloseButton) {
         infoCloseButton.addEventListener('click', function() {
             infoPanel.classList.remove('active');
@@ -126,17 +125,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 3D model görüntüleme
     if (view3DButton) {
         view3DButton.addEventListener('click', function() {
-            const state = activeState;
-            if (state && modelModal) {
-                const modelPath = mapData[getCurrentYear()].states[state].coinModel;
+            if (activeState && modelModal) {
+                const modelPath = mapData[getCurrentYear()].states[activeState].coinModel;
                 modelModal.style.display = 'block';
                 init3DViewer();
                 loadModel(modelPath);
             }
         });
     }
+
+    // Modal kapatma
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+                if (renderer) {
+                    renderer.dispose();
+                    document.getElementById('model-viewer').innerHTML = '';
+                }
+            }
+        });
+    });
+
+    // ESC tuşu ile modalı kapatma
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modelModal) {
+            modelModal.style.display = 'none';
+            if (renderer) {
+                renderer.dispose();
+                document.getElementById('model-viewer').innerHTML = '';
+            }
+        }
+    });
 
     // Zoom kontrolleri
     if (zoomInBtn) {
@@ -150,27 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (camera) camera.position.z *= 1.1;
         });
     }
-
-    // ESC tuşu ile modalı kapatma
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modelModal) {
-            modelModal.style.display = 'none';
-            if (renderer) {
-                renderer.dispose();
-                document.getElementById('model-viewer').innerHTML = '';
-            }
-        }
-    });
-
-    // Pencere boyutu değiştiğinde
-    window.addEventListener('resize', function() {
-        const container = document.getElementById('model-viewer');
-        if (renderer && camera && container) {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        }
-    });
 });
 
 // Harita yükleme fonksiyonu
