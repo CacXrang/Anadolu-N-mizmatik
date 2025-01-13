@@ -178,17 +178,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Harita yükleme fonksiyonu
 function loadMap(year) {
+    console.log('Harita yükleniyor:', year); // Debug için log
     const mapImage = document.querySelector('#map img');
-    mapImage.src = `maps/${year}.png`;
-    mapImage.onload = () => {
-        setupMapInteraction(year);
-    };
+    if (mapImage) {
+        mapImage.src = `./maps/${year}.png`; // ./ eklendi
+        mapImage.onload = () => {
+            console.log('Harita yüklendi'); // Debug için log
+            setupMapInteraction(year);
+        };
+    }
 }
 
 // Harita etkileşimini kurma
 function setupMapInteraction(year) {
+    console.log('Harita etkileşimi kuruluyor:', year); // Debug için log
     const mapContainer = document.querySelector('.map-container');
     const mapImage = mapContainer.querySelector('img');
+
+    if (!mapContainer || !mapImage) {
+        console.error('Harita elementleri bulunamadı');
+        return;
+    }
 
     // Önceki event listener'ları temizle
     const newMapContainer = mapContainer.cloneNode(true);
@@ -201,7 +211,6 @@ function setupMapInteraction(year) {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        // Görüntü boyutuna göre ölçeklendirme
         const scaleX = newMapImage.naturalWidth / rect.width;
         const scaleY = newMapImage.naturalHeight / rect.height;
         
@@ -220,36 +229,6 @@ function setupMapInteraction(year) {
                 clicked = true;
                 break;
             }
-        }
-
-        if (!clicked) {
-            console.log('Bu koordinatlarda devlet bulunamadı');
-        }
-    });
-
-    // Hover efekti için mousemove event listener'ı
-    newMapImage.addEventListener('mousemove', function(e) {
-        const rect = newMapImage.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const scaleX = newMapImage.naturalWidth / rect.width;
-        const scaleY = newMapImage.naturalHeight / rect.height;
-        
-        const actualX = Math.round(x * scaleX);
-        const actualY = Math.round(y * scaleY);
-
-        let isOverState = false;
-        for (const stateData of Object.values(mapData[year].states)) {
-            if (stateData.coordinates && isPointInState(actualX, actualY, stateData.coordinates)) {
-                newMapImage.style.cursor = 'pointer';
-                isOverState = true;
-                break;
-            }
-        }
-
-        if (!isOverState) {
-            newMapImage.style.cursor = 'default';
         }
     });
 }
@@ -307,18 +286,23 @@ function showStateInfo(name, data) {
 
 // 3D viewer başlatma
 function init3DViewer() {
-    console.log('3D viewer başlatılıyor');
+    console.log('3D viewer başlatılıyor'); // Debug için log
     const container = document.getElementById('model-viewer');
     
+    if (!container) {
+        console.error('model-viewer container bulunamadı');
+        return;
+    }
+
     // Scene oluştur
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x2a2a2a); // Koyu arka plan
+    scene.background = new THREE.Color(0x2a2a2a);
     
-    // Camera oluştur - daha düşük FOV ile daha keskin görüntü
+    // Camera oluştur
     camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
     camera.position.z = 4;
     
-    // Yüksek kaliteli renderer
+    // Renderer oluştur
     renderer = new THREE.WebGLRenderer({ 
         antialias: true,
         precision: 'highp',
@@ -326,38 +310,22 @@ function init3DViewer() {
     });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
     
-    // Gelişmiş ışıklandırma
+    // Işıklandırma
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
     
     const mainLight = new THREE.DirectionalLight(0xffffff, 1);
     mainLight.position.set(5, 5, 5);
-    mainLight.castShadow = true;
     scene.add(mainLight);
     
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.7);
-    fillLight.position.set(-5, 0, -5);
-    scene.add(fillLight);
-    
-    const rimLight = new THREE.DirectionalLight(0xffffff, 0.3);
-    rimLight.position.set(0, -5, 0);
-    scene.add(rimLight);
-
     // Kontroller
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.enableZoom = true;
-    controls.autoRotate = false;
-    controls.minDistance = 2;
-    controls.maxDistance = 10;
-    
-    console.log('3D viewer hazır');
     
     // Animasyon döngüsü
     function animate() {
@@ -370,9 +338,13 @@ function init3DViewer() {
 
 // Model yükleme
 function loadModel(modelPath) {
-    console.log('Model yükleme başlatılıyor...');
-    console.log('Model yolu:', modelPath);
+    console.log('Model yükleniyor:', modelPath); // Debug için log
     
+    if (!scene) {
+        console.error('Scene henüz oluşturulmadı');
+        return;
+    }
+
     const loader = new THREE.OBJLoader();
     
     if (model) {
@@ -380,15 +352,13 @@ function loadModel(modelPath) {
         model = null;
     }
     
-    // Gelişmiş materyal ayarları
     const material = new THREE.MeshPhysicalMaterial({
-        color: 0xb87333,  // Bronz rengi
-        metalness: 0.9,   // Metalik görünüm
-        roughness: 0.3,   // Pürüzsüzlük
+        color: 0xb87333,
+        metalness: 0.9,
+        roughness: 0.3,
         reflectivity: 0.8,
-        clearcoat: 0.3,   // Cilalı görünüm
-        clearcoatRoughness: 0.2,
-        envMapIntensity: 1.0
+        clearcoat: 0.3,
+        clearcoatRoughness: 0.2
     });
     
     try {
@@ -401,53 +371,32 @@ function loadModel(modelPath) {
                 model.traverse(function(child) {
                     if (child instanceof THREE.Mesh) {
                         child.material = material;
-                        child.castShadow = true;
-                        child.receiveShadow = true;
                     }
                 });
                 
-                // Modeli ortala ve ölçeklendir
                 const box = new THREE.Box3().setFromObject(model);
                 const center = box.getCenter(new THREE.Vector3());
                 const size = box.getSize(new THREE.Vector3());
                 
                 const maxDim = Math.max(size.x, size.y, size.z);
-                const scale = 2.5 / maxDim; // Biraz daha büyük ölçek
+                const scale = 2.5 / maxDim;
                 
                 model.scale.multiplyScalar(scale);
                 model.position.sub(center.multiplyScalar(scale));
                 
-                // Modeli hafifçe döndür
-                model.rotation.x = -Math.PI / 6;
-                
                 scene.add(model);
-                camera.position.z = 4;
-                camera.lookAt(model.position);
-                controls.target.copy(model.position);
-                controls.update();
                 
                 console.log('Model sahneye eklendi');
             },
             function(xhr) {
-                if (xhr.lengthComputable) {
-                    const percent = (xhr.loaded / xhr.total * 100);
-                    console.log(`Yükleme ilerlemesi: ${percent}%`);
-                }
+                console.log(`Yükleme ilerlemesi: ${(xhr.loaded / xhr.total * 100)}%`);
             },
             function(error) {
                 console.error('Model yükleme hatası:', error);
-                console.error('Hata detayları:', {
-                    modelPath: modelPath,
-                    errorMessage: error.message,
-                    errorStack: error.stack
-                });
-                alert('Model yüklenirken bir hata oluştu. Lütfen konsolu kontrol edin.');
             }
         );
     } catch (error) {
         console.error('Model yükleme işlemi başlatılırken hata:', error);
-        console.error('Tam hata:', error.stack);
-        alert('Model yükleme işlemi başlatılamadı.');
     }
 }
 
