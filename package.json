@@ -4,8 +4,8 @@
   "description": "Anadolu'nun tarihsel süreçteki devletlerini ve paralarını gösteren interaktif web uygulaması",
   "main": "index.html",
   "scripts": {
-    "start": "live-server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "echo 'No build required'",
+    "start": "live-server"
   },
   "keywords": [
     "anadolu",
@@ -17,14 +17,8 @@
   ],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "three": "^0.160.0",
-    "@types/three": "^0.160.0",
-    "gsap": "^3.12.4",
-    "stats.js": "^0.17.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "live-server": "^1.2.2",
-    "vite": "^5.0.10"
+    "live-server": "^1.2.2"
   }
 } 
