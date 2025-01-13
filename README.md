@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Anadolu Tarihi Harita ve Para Koleksiyonu
 
 Bu proje, Anadolu'nun tarihsel süreçteki devletlerini ve kullandıkları paraları interaktif bir şekilde gösteren web tabanlı bir uygulamadır.
@@ -72,3 +73,7 @@ proje/
 ## Lisans
 
 Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakınız.
+=======
+# Anadolu-N-mizmatik
+ Anadolu'nun tarihsel süreçteki devletlerini ve paralarını gösteren interaktif web uygulaması
+>>>>>>> 78328f84ff6ac7025f126a766d5c10eec95fbda8
