@@ -158,6 +158,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Zoom kontrolleri
+    const zoomInBtn = document.getElementById('zoomIn');
+    const zoomOutBtn = document.getElementById('zoomOut');
+
+    if (zoomInBtn) {
+        zoomInBtn.addEventListener('click', function() {
+            if (camera) {
+                camera.position.z *= 0.8; // Daha hızlı zoom
+                camera.updateProjectionMatrix();
+            }
+        });
+    }
+
+    if (zoomOutBtn) {
+        zoomOutBtn.addEventListener('click', function() {
+            if (camera) {
+                camera.position.z *= 1.2; // Daha hızlı zoom out
+                camera.updateProjectionMatrix();
+            }
+        });
+    }
 });
 
 // Harita yükleme fonksiyonu
@@ -261,7 +283,7 @@ function init3DViewer() {
     
     // Camera oluştur
     camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.z = 4;
+    camera.position.z = 5; // Başlangıç zoom seviyesi
     
     // Renderer oluştur
     renderer = new THREE.WebGLRenderer({ 
