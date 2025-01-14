@@ -74,21 +74,125 @@ const coinInfo = {
     "artuklu_coin": {
         title: "Artuklu Bakır Sikkesi",
         details: {
-            weight: "7.20 gr",
-            diameter: "2.7 cm",
-            thickness: "2 mm",
-            period: "Mardin Artukluları (1108-1408)",
-            ruler: "Nasır el-Dîn Artuk Arslan (1200-1239)",
-            description: `Mardin Artuklu hükümdarı Nasır el-Din Artuk Arslan dönemine tarihlenen bu örnekteki figürün bir tahtta gösteriliyor olmasından dolayı diğerlerinden ayrılmaktadır. Türk kültüründe çok eskilere dayanan bağdaş kurma pozisyonu şeklinde gösterilen figür, sikkenin merkezine yerleştirilmiştir.`,
-            frontInscription: {
-                right: "ارتق ارسالن (Artuk Arslan)",
-                left: "ناصر لدين (Nasruddin)",
-                meaning: "Dinin yardımcısı Artuk Arslan"
+            physical: {
+                material: "Bakır",
+                diameter: "2.7 cm",
+                weight: "7.20 gr",
+                thickness: "2 mm"
             },
-            backInscription: "el-İmam'ül-Müstansır Emirû'l-Mü'minin el-Melikü'l-Kamil (Müminlerin emiri, imamı Müstansır Billâh, kusursuz melik Muhammed)"
+            historical: {
+                period: "Mardin Artukluları (1108-1408)",
+                ruler: "Nasır el-Dîn Artuk Arslan (1200-1239)",
+                description: "Mardin Artuklu hükümdarı Nasır el-Din Artuk Arslan dönemine tarihlenen bu örnekteki figürün bir tahtta gösteriliyor olmasından dolayı diğerlerinden ayrılmaktadır. Türk kültüründe çok eskilere dayanan bağdaş kurma pozisyonu şeklinde gösterilen figür, sikkenin merkezine yerleştirilmiştir."
+            },
+            inscriptions: {
+                front: {
+                    text: "ارتق ارسالن (Artuk Arslan)",
+                    description: "Sağda: Artuk Arslan"
+                },
+                back: {
+                    text: "ناصر لدين (Nasruddin)",
+                    description: "Solda: Nasruddin, Anlamı: Dinin yardımcısı Artuk Arslan"
+                },
+                additional: "el-İmam'ül-Müstansır Emirû'l-Mü'minin el-Melikü'l-Kamil (Müminlerin emiri, imamı Müstansır Billâh, kusursuz melik Muhammed)"
+            }
+        }
+    },
+    "selcuklu_coin": {
+        title: "Anadolu Selçuklu Sikkesi",
+        details: {
+            museum: {
+                arrivalDate: "21.11.2017",
+                acquisitionInfo: "İbrahim Şen'den satın alma. Denizli-Çardak"
+            },
+            material: "Gümüş",
+            technique: "Dövme (Darp)",
+            scriptStyle: "Sülüs",
+            diameter: "2.4 cm",
+            weight: "2.93 gr",
+            inscriptions: {
+                front: {
+                    text: "Lâ İlâhe İllallâh Muhammedün Resûlullâh el-imâmu'l-Musta'sım Bi'llâh Emîrü'l-Mü'minîn Duribe sene hamse hamsin sittemi'e.",
+                    description: "Yatay çizgiyle ortadan ikiye bölünen sikkenin üst kısmında 'Allah'tan başka ilah yoktur, Muhammed O'nun elçisidir. Müminlerin Emiri' alt kısımda ise Rakamlar divani harfle verilmiştir. En üstte simetrik rumi motifine yer verilmiştir. Yazıların arasında tirfil ve noktalar bulunmaktadır."
+                },
+                back: {
+                    text: "Es-Selâtinü'l eâzım İzzü'd-dünyâ ve'd-dîn Keykavus ve Rüknü'd-dünyâ ve'd-dîn Kılıçarslan ve Alâü'd-dünyâ ve'd-dîn Keykubad benü Keyhüsrev berâhin emîrü'l mü'minîn.",
+                    description: "Beş satırlık yatay yazıda 'En büyük sultanlar din ve dünyanın izzeti Keykavus, din ve dünyanın direği Kılıç Arslan, Keyhüsrev oğlu din ve dünyanın temsilcisi Keykubad müminlerin emirinin delilleri' yazmaktadır. En üstte simetrik rumi motifine yer verilmiştir. Harf aralarını yer yer tirfiller doldurmaktadır."
+                }
+            }
+        }
+    },
+    "karamanoglu_coin": {
+        title: "Karamanoğulları Dirhemi",
+        details: {
+            type: "AR, Dirhem",
+            mint: "Larende",
+            date: "H.822 (YKB-511)",
+            diameter: "20 mm",
+            weight: "1.30 gr",
+            inscriptions: {
+                front: {
+                    text: "Duribe Larende Ali bin Aladdin halled'Allahü mülkehu",
+                    description: "Larende'de darp edildi. Ali bin Alaaddin, Allah mülkünü daim etsin"
+                },
+                back: {
+                    text: "Es- Sultan El- Melik El –Müeyyed Ebu'l Nasır Şeyh azze nasruhu",
+                    description: "Sultan, Melik, Müeyyed Ebu'l Nasır Şeyh, zaferi aziz olsun"
+                }
+            }
+        }
+    },
+    "osmanli_coin": {
+        title: "Osmanlı Akçesi",
+        details: {
+            catalogInfo: {
+                number: "13",
+                location: "Sinop Arkeoloji Müzesi",
+                inventoryNumber: "1.82.013",
+                acquisitionInfo: "Hibe (Ali Rıza Ünlü)",
+                storageLocation: "Depo",
+                photoNumber: "13-13A",
+                drawingNumber: "13-13A"
+            },
+            physical: {
+                material: "Gümüş",
+                type: "Akçe",
+                diameter: "13 mm",
+                weight: "1.1 gr"
+            },
+            historical: {
+                dateHijri: "H.816-824",
+                dateCE: "M.1413-1421",
+                mintPlace: "Amasya",
+                mintDate: {
+                    hijri: "H.816",
+                    ce: "M.1413"
+                },
+                scriptStyle: "Sülüs"
+            }
+        }
+    },
+    "bizans_coin": {
+        title: "Bizans Solidusu",
+        details: {
+            physical: {
+                material: "Altın",
+                type: "Solidus"
+            },
+            historical: {
+                period: "Bizans İmparatorluğu",
+                rulers: "VII. Konstantinos ve II. Romanus Dönemi"
+            },
+            inscriptions: {
+                front: {
+                    description: "Sağ elini havaya kaldırmış, sol elinde İncil tutan, tunik ve başpiskopos cübbesi giyen İsa motifi bulunmaktadır."
+                },
+                back: {
+                    description: "Haç tutan VII. Konstantinos ve II. Romanus motifi bulunmaktadır."
+                }
+            }
         }
     }
-    // Diğer sikkeler için bilgiler eklenebilir
 };
 
 // DOM yüklendikten sonra çalışacak şekilde düzenleyelim
@@ -352,25 +456,46 @@ function loadModel(modelPath) {
         const info = coinInfo[coinId];
         const infoContainer = document.createElement('div');
         infoContainer.className = 'coin-info';
-        infoContainer.innerHTML = `
-            <h3>${info.title}</h3>
-            <div class="coin-details">
-                <p><strong>Ağırlık:</strong> ${info.details.weight}</p>
-                <p><strong>Çap:</strong> ${info.details.diameter}</p>
-                <p><strong>Kalınlık:</strong> ${info.details.thickness}</p>
-                <p><strong>Dönem:</strong> ${info.details.period}</p>
-                <p><strong>Hükümdar:</strong> ${info.details.ruler}</p>
-                <p><strong>Açıklama:</strong> ${info.details.description}</p>
-                <div class="inscriptions">
-                    <h4>Ön Yüz Yazıları:</h4>
-                    <p>Sağda: ${info.details.frontInscription.right}</p>
-                    <p>Solda: ${info.details.frontInscription.left}</p>
-                    <p>Anlamı: ${info.details.frontInscription.meaning}</p>
-                    <h4>Arka Yüz Yazısı:</h4>
-                    <p>${info.details.backInscription}</p>
-                </div>
-            </div>
-        `;
+        
+        let html = `<h3>${info.title}</h3><div class="coin-details">`;
+
+        // Fiziksel özellikler
+        if (info.details.physical) {
+            const physical = info.details.physical;
+            html += '<div class="physical-info"><h4>Fiziksel Özellikler</h4>';
+            if (physical.material) html += `<p><strong>Malzeme:</strong> ${physical.material}</p>`;
+            if (physical.type) html += `<p><strong>Cins:</strong> ${physical.type}</p>`;
+            if (physical.diameter) html += `<p><strong>Çap:</strong> ${physical.diameter}</p>`;
+            if (physical.weight) html += `<p><strong>Ağırlık:</strong> ${physical.weight}</p>`;
+            if (physical.thickness) html += `<p><strong>Kalınlık:</strong> ${physical.thickness}</p>`;
+            html += '</div>';
+        }
+
+        // Tarihsel bilgiler
+        if (info.details.historical) {
+            const historical = info.details.historical;
+            html += '<div class="historical-info"><h4>Tarihsel Bilgiler</h4>';
+            if (historical.period) html += `<p><strong>Dönem:</strong> ${historical.period}</p>`;
+            if (historical.rulers) html += `<p><strong>Hükümdar:</strong> ${historical.rulers}</p>`;
+            if (historical.description) html += `<p><strong>Açıklama:</strong> ${historical.description}</p>`;
+            html += '</div>';
+        }
+
+        // Yazılar ve tasvirler
+        if (info.details.inscriptions) {
+            const inscriptions = info.details.inscriptions;
+            html += '<div class="inscriptions"><h4>Tasvirler</h4>';
+            if (inscriptions.front && inscriptions.front.description) {
+                html += `<p><strong>Ön Yüz:</strong> ${inscriptions.front.description}</p>`;
+            }
+            if (inscriptions.back && inscriptions.back.description) {
+                html += `<p><strong>Arka Yüz:</strong> ${inscriptions.back.description}</p>`;
+            }
+            html += '</div>';
+        }
+
+        html += '</div>';
+        infoContainer.innerHTML = html;
         document.querySelector('.modal-content').appendChild(infoContainer);
     }
 
