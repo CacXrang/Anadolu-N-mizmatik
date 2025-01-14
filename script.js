@@ -18,7 +18,7 @@ const mapData = {
                 wikiUrl: "https://islamansiklopedisi.org.tr/selcuklular#2-anadolu-selcuklulari",
                 coinModel: "./models/selcuklu_coin.obj"
             },
-            "Artukular": {
+            "Artuklu Devleti": {
                 coordinates: "4986,2138,4946,2252,4821,2309,4605,2360,4588,2457,4588,2548,4634,2707,4719,2798,4668,3008,4759,3082,4833,3116,4929,3128,5071,3111,5168,3133,5305,3093,5686,3099,5839,3054,5879,2946,5879,2769,5930,2684,6101,2684,6265,2724,6430,2747,6430,1973,6317,1928,6157,1808,6010,1678,5879,1649,5794,1655,5731,1604,5435,1757,5191,1871",
                 wikiUrl: "https://islamansiklopedisi.org.tr/artuklular",
                 coinModel: "./models/artuklu_coin.obj"
@@ -58,26 +58,36 @@ const mapData = {
 
 const timelineData = {
     "1100AD": {
-        summary: "1100 yılında Anadolu Selçuklu Devleti, Anadolu'nun büyük bir kısmına hakimdir. Bizans İmparatorluğu ise batı kıyılarında varlığını sürdürmektedir.",
-        legend: [
-            { color: "#FFB6C1", name: "Anadolu Selçuklu Devleti" },
-            { color: "#87CEEB", name: "Bizans İmparatorluğu" }
-        ]
+        summary: "1100 yılında Anadolu'da çeşitli medeniyetler hüküm sürmüştür. Seçilen bölgeye tıklayarak detaylı bilgi alabilirsiniz."
     },
     "1330AD": {
-        summary: "1330 yılında Anadolu'da beylikler dönemi yaşanmaktadır. Osmanoğulları ve Karamanoğulları önemli beylikler arasındadır. Bizans İmparatorluğu ise batıda varlığını sürdürmektedir.",
-        legend: [
-            { color: "#FFB6C1", name: "Osmanoğulları" },
-            { color: "#98FB98", name: "Karamanoğulları" },
-            { color: "#87CEEB", name: "Bizans İmparatorluğu" }
-        ]
+        summary: "1330 yılında Anadolu'da beylikler dönemi yaşanmaktadır. Osmanoğulları ve Karamanoğulları önemli beylikler arasındadır."
     },
     "1500AD": {
-        summary: "1500 yılında Osmanlı İmparatorluğu Anadolu'nun tamamına hakimdir. İstanbul'un fethi sonrası güçlenen imparatorluk, üç kıtaya yayılmıştır.",
-        legend: [
-            { color: "#FFB6C1", name: "Osmanlı İmparatorluğu" }
-        ]
+        summary: "1500 yılında Osmanlı İmparatorluğu Anadolu'nun tamamına hakimdir."
     }
+};
+
+// Sikke bilgilerini tutan nesne
+const coinInfo = {
+    "artuklu_coin": {
+        title: "Artuklu Bakır Sikkesi",
+        details: {
+            weight: "7.20 gr",
+            diameter: "2.7 cm",
+            thickness: "2 mm",
+            period: "Mardin Artukluları (1108-1408)",
+            ruler: "Nasır el-Dîn Artuk Arslan (1200-1239)",
+            description: `Mardin Artuklu hükümdarı Nasır el-Din Artuk Arslan dönemine tarihlenen bu örnekteki figürün bir tahtta gösteriliyor olmasından dolayı diğerlerinden ayrılmaktadır. Türk kültüründe çok eskilere dayanan bağdaş kurma pozisyonu şeklinde gösterilen figür, sikkenin merkezine yerleştirilmiştir.`,
+            frontInscription: {
+                right: "ارتق ارسالن (Artuk Arslan)",
+                left: "ناصر لدين (Nasruddin)",
+                meaning: "Dinin yardımcısı Artuk Arslan"
+            },
+            backInscription: "el-İmam'ül-Müstansır Emirû'l-Mü'minin el-Melikü'l-Kamil (Müminlerin emiri, imamı Müstansır Billâh, kusursuz melik Muhammed)"
+        }
+    }
+    // Diğer sikkeler için bilgiler eklenebilir
 };
 
 // DOM yüklendikten sonra çalışacak şekilde düzenleyelim
@@ -95,46 +105,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Varsayılan yılı ayarla ve haritayı yükle
     const defaultYear = '1100AD';
-    loadMap(defaultYear);
-    
+    const defaultButton = document.querySelector(`[data-year="${defaultYear}"]`);
+    if (defaultButton) {
+        defaultButton.classList.add('active');
+        loadMap(defaultYear);
+        setupMapInteraction(defaultYear); // Doğrudan setupMapInteraction'ı çağır
+    }
+
     // Timeline butonlarına tıklama olayını ekle
     timelineButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const year = this.getAttribute('data-year');
-            // Aktif butonu güncelle
-            timelineButtons.forEach(btn => btn.classList.remove('active'));
+            const year = this.dataset.year;
+            document.querySelector('.timeline-btn.active')?.classList.remove('active');
             this.classList.add('active');
-            
-            // Haritayı güncelle
             loadMap(year);
+            setupMapInteraction(year);
         });
     });
 
     // Bilgi panelini kapatma
     if (infoCloseButton) {
         infoCloseButton.addEventListener('click', function() {
-            if (infoPanel) {
-                infoPanel.classList.remove('active');
-                if (wikiFrame) {
-                    wikiFrame.src = 'about:blank';
-                }
-            }
+            infoPanel.classList.remove('active');
+            if (wikiFrame) wikiFrame.src = '';
         });
     }
-
-    // Harita dışı tıklamaları dinle
-    document.addEventListener('click', function(e) {
-        // Eğer tıklanan element harita veya bilgi paneli değilse
-        if (!e.target.closest('#map') && !e.target.closest('.info-panel')) {
-            // Bilgi panelini kapat
-            if (infoPanel) {
-                infoPanel.classList.remove('active');
-                if (wikiFrame) {
-                    wikiFrame.src = 'about:blank';
-                }
-            }
-        }
-    });
 
     // 3D model görüntüleme
     if (view3DButton) {
@@ -252,7 +247,6 @@ function showStateInfo(name, data) {
 
 // 3D viewer başlatma
 function init3DViewer() {
-    console.log('3D viewer başlatılıyor'); // Debug için log
     const container = document.getElementById('model-viewer');
     
     if (!container) {
@@ -276,22 +270,36 @@ function init3DViewer() {
     });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.physicallyCorrectLights = true; // Fiziksel ışık davranışı
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
     
     // Işıklandırma
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Ambient ışık arttırıldı
     scene.add(ambientLight);
     
-    const mainLight = new THREE.DirectionalLight(0xffffff, 1);
-    mainLight.position.set(5, 5, 5);
-    scene.add(mainLight);
+    // Ön ışık
+    const frontLight = new THREE.DirectionalLight(0xffffff, 2);
+    frontLight.position.set(0, 0, 5);
+    scene.add(frontLight);
+    
+    // Arka ışık
+    const backLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    backLight.position.set(0, 0, -5);
+    scene.add(backLight);
+    
+    // Üst ışık
+    const topLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    topLight.position.set(0, 5, 0);
+    scene.add(topLight);
     
     // Kontroller
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.enableZoom = true;
+    controls.autoRotate = true; // Otomatik döndürme
+    controls.autoRotateSpeed = 2; // Döndürme hızı
     
     // Animasyon döngüsü
     function animate() {
@@ -304,11 +312,43 @@ function init3DViewer() {
 
 // Model yükleme
 function loadModel(modelPath) {
-    console.log('Model yükleniyor:', modelPath); // Debug için log
-    
     if (!scene) {
         console.error('Scene henüz oluşturulmadı');
         return;
+    }
+
+    // Önce mevcut bilgi panelini temizle
+    const existingInfo = document.querySelector('.coin-info');
+    if (existingInfo) {
+        existingInfo.remove();
+    }
+
+    // Sikke bilgilerini göster
+    const coinId = modelPath.split('/').pop().replace('.obj', '');
+    if (coinInfo[coinId]) {
+        const info = coinInfo[coinId];
+        const infoContainer = document.createElement('div');
+        infoContainer.className = 'coin-info';
+        infoContainer.innerHTML = `
+            <h3>${info.title}</h3>
+            <div class="coin-details">
+                <p><strong>Ağırlık:</strong> ${info.details.weight}</p>
+                <p><strong>Çap:</strong> ${info.details.diameter}</p>
+                <p><strong>Kalınlık:</strong> ${info.details.thickness}</p>
+                <p><strong>Dönem:</strong> ${info.details.period}</p>
+                <p><strong>Hükümdar:</strong> ${info.details.ruler}</p>
+                <p><strong>Açıklama:</strong> ${info.details.description}</p>
+                <div class="inscriptions">
+                    <h4>Ön Yüz Yazıları:</h4>
+                    <p>Sağda: ${info.details.frontInscription.right}</p>
+                    <p>Solda: ${info.details.frontInscription.left}</p>
+                    <p>Anlamı: ${info.details.frontInscription.meaning}</p>
+                    <h4>Arka Yüz Yazısı:</h4>
+                    <p>${info.details.backInscription}</p>
+                </div>
+            </div>
+        `;
+        document.querySelector('.modal-content').appendChild(infoContainer);
     }
 
     const loader = new THREE.OBJLoader();
@@ -318,52 +358,47 @@ function loadModel(modelPath) {
         model = null;
     }
     
-    const material = new THREE.MeshPhysicalMaterial({
-        color: 0xb87333,
-        metalness: 0.9,
-        roughness: 0.3,
-        reflectivity: 0.8,
-        clearcoat: 0.3,
-        clearcoatRoughness: 0.2
+    // Materyal ayarları güncellendi
+    const material = new THREE.MeshStandardMaterial({
+        color: 0xb87333, // Bakır rengi
+        metalness: 0.7,  // Metalik efekt azaltıldı
+        roughness: 0.2,  // Pürüzsüzlük arttırıldı
+        envMapIntensity: 1.0,
+        flatShading: false
     });
     
-    try {
-        loader.load(
-            modelPath,
-            function(object) {
-                console.log('Model başarıyla yüklendi');
-                model = object;
-                
-                model.traverse(function(child) {
-                    if (child instanceof THREE.Mesh) {
-                        child.material = material;
-                    }
-                });
-                
-                const box = new THREE.Box3().setFromObject(model);
-                const center = box.getCenter(new THREE.Vector3());
-                const size = box.getSize(new THREE.Vector3());
-                
-                const maxDim = Math.max(size.x, size.y, size.z);
-                const scale = 2.5 / maxDim;
-                
-                model.scale.multiplyScalar(scale);
-                model.position.sub(center.multiplyScalar(scale));
-                
-                scene.add(model);
-                
-                console.log('Model sahneye eklendi');
-            },
-            function(xhr) {
-                console.log(`Yükleme ilerlemesi: ${(xhr.loaded / xhr.total * 100)}%`);
-            },
-            function(error) {
-                console.error('Model yükleme hatası:', error);
-            }
-        );
-    } catch (error) {
-        console.error('Model yükleme işlemi başlatılırken hata:', error);
-    }
+    loader.load(
+        modelPath,
+        function(object) {
+            model = object;
+            model.traverse(function(child) {
+                if (child instanceof THREE.Mesh) {
+                    child.material = material;
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 2.5 / maxDim;
+            
+            model.scale.multiplyScalar(scale);
+            model.position.sub(center.multiplyScalar(scale));
+            
+            scene.add(model);
+            
+            // Kamerayı modele odakla
+            camera.lookAt(model.position);
+        },
+        undefined,
+        function(error) {
+            console.error('Model yükleme hatası:', error);
+        }
+    );
 }
 
 // Aktif yılı alma
