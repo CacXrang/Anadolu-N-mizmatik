@@ -45,12 +45,13 @@ const mapData = {
             }
         }
     },
-    "1500AD": {
-        mapImage: "maps/1500AD.png",
+    "1600AD": {
+        mapImage: "maps/1600AD.png",
         states: {
             "Osmanlı İmparatorluğu": {
+                coordinates: "445,51,19,290,2,699,81,1393,224,2070,587,2786,1457,3002,2891,3054,3578,2775,3754,3235,6415,3241,6422,705,6011,204,5392,574,4988,455,4840,602,4522,443,4130,358,3709,153,3419,17,2708,74,2049,455,1082,415,878,0,651,0",
                 wikiUrl: "https://islamansiklopedisi.org.tr/osmanlilar",
-                coinModel: "models/osmanli_coin.obj"
+                coinModel: "./models/osmanli_coin.obj"
             }
         }
     }
@@ -63,8 +64,8 @@ const timelineData = {
     "1330AD": {
         summary: "1330 yılında Anadolu'da beylikler dönemi yaşanmaktadır. Osmanoğulları ve Karamanoğulları önemli beylikler arasındadır."
     },
-    "1500AD": {
-        summary: "1500 yılında Osmanlı İmparatorluğu Anadolu'nun tamamına hakimdir."
+    "1600AD": {
+        summary: "1600 yılında Osmanlı İmparatorluğu en güçlü dönemindedir ve üç kıtaya yayılmıştır."
     }
 };
 
@@ -403,7 +404,7 @@ function loadModel(modelPath) {
 
 // Aktif yılı alma
 function getCurrentYear() {
-    const activeButton = document.querySelector('.timeline button.active');
+    const activeButton = document.querySelector('.timeline-btn.active');
     return activeButton ? activeButton.dataset.year : '1100AD';
 }
 
