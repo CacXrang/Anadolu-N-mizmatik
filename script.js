@@ -285,8 +285,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function loadMap(year) {
     const mapImage = document.querySelector('#map img');
+    const infoBox = document.querySelector('.info-box p');
+    
     if (mapImage) {
         mapImage.src = `./maps/${year}.png`;
+        if (infoBox && timelineData[year]) {
+            infoBox.textContent = timelineData[year].summary;
+        }
+        
         mapImage.onload = () => {
             setupMapInteraction(year);
         };
