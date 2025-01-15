@@ -1,5 +1,5 @@
 <<<<<<< HEAD
-# Anadolu Tarihi Harita ve Para Koleksiyonu
+# İmparaTarih
 
 Bu proje, Anadolu'nun tarihsel süreçteki devletlerini ve kullandıkları paraları interaktif bir şekilde gösteren web tabanlı bir uygulamadır.
 
@@ -11,29 +11,6 @@ Bu proje, Anadolu'nun tarihsel süreçteki devletlerini ve kullandıkları paral
 - Zaman çizelgesi üzerinden kolay dönem geçişi
 - Mobil uyumlu tasarım
 
-## Kurulum
-
-1. Projeyi bilgisayarınıza indirin:
-```bash
-git clone [proje-url]
-```
-
-2. Gerekli dosya yapısını oluşturun:
-```
-proje/
-├── index.html
-├── styles.css
-├── script.js
-├── maps/
-│   ├── 1000BC.jpg
-│   ├── 750BC.jpg
-│   └── ...
-└── models/
-    ├── hitit_coin.glb
-    └── ...
-```
-
-3. Bir web sunucusu üzerinde çalıştırın (örneğin Live Server)
 
 ## Kullanım
 
@@ -48,19 +25,6 @@ proje/
 - 3D model görüntüleme için Three.js kütüphanesi kullanılmıştır
 - Responsive tasarım için modern CSS özellikleri kullanılmıştır
 
-## Gereksinimler
-
-- Modern bir web tarayıcısı (Chrome, Firefox, Safari, Edge)
-- WebGL destekli grafik kartı
-- JavaScript'in etkin olması
-
-## Katkıda Bulunma
-
-1. Bu depoyu fork edin
-2. Yeni bir branch oluşturun (`git checkout -b yeni-ozellik`)
-3. Değişikliklerinizi commit edin (`git commit -am 'Yeni özellik eklendi'`)
-4. Branch'inizi push edin (`git push origin yeni-ozellik`)
-5. Pull Request oluşturun
 
 ## Yapılacaklar
 

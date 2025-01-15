@@ -3,7 +3,6 @@ let scene, camera, renderer, model, controls;
 let mixer, clock;
 let activeState = null;
 
-// Harita verilerini tutacak nesne
 const mapData = {
     "1100AD": {
         mapImage: "./maps/1100AD.png",
@@ -69,7 +68,6 @@ const timelineData = {
     }
 };
 
-// Sikke bilgilerini tutan nesne
 const coinInfo = {
     "artuklu_coin": {
         title: "Artuklu Bakır Sikkesi",
@@ -195,7 +193,6 @@ const coinInfo = {
     }
 };
 
-// DOM yüklendikten sonra çalışacak şekilde düzenleyelim
 document.addEventListener('DOMContentLoaded', function() {
     // DOM elementlerini seçme
     const timelineButtons = document.querySelectorAll('.timeline-btn');
@@ -208,16 +205,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const stateName = document.getElementById('stateName');
     const wikiFrame = document.getElementById('wikiFrame');
 
-    // Varsayılan yılı ayarla ve haritayı yükle
+    
     const defaultYear = '1100AD';
     const defaultButton = document.querySelector(`[data-year="${defaultYear}"]`);
     if (defaultButton) {
         defaultButton.classList.add('active');
         loadMap(defaultYear);
-        setupMapInteraction(defaultYear); // Doğrudan setupMapInteraction'ı çağır
+        setupMapInteraction(defaultYear); 
     }
 
-    // Timeline butonlarına tıklama olayını ekle
     timelineButtons.forEach(button => {
         button.addEventListener('click', function() {
             const year = this.dataset.year;
@@ -228,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Bilgi panelini kapatma
+   
     if (infoCloseButton) {
         infoCloseButton.addEventListener('click', function() {
             infoPanel.classList.remove('active');
@@ -236,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 3D model görüntüleme
+    
     if (view3DButton) {
         view3DButton.addEventListener('click', function() {
             if (activeState && modelModal) {
@@ -249,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Modal kapatma
+    
     closeButtons.forEach(button => {
         button.addEventListener('click', function() {
             const modal = this.closest('.modal');
@@ -263,14 +259,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Zoom kontrolleri
+   
     const zoomInBtn = document.getElementById('zoomIn');
     const zoomOutBtn = document.getElementById('zoomOut');
 
     if (zoomInBtn) {
         zoomInBtn.addEventListener('click', function() {
             if (camera) {
-                camera.position.z *= 0.8; // Daha hızlı zoom
+                camera.position.z *= 0.8; 
                 camera.updateProjectionMatrix();
             }
         });
@@ -279,14 +275,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (zoomOutBtn) {
         zoomOutBtn.addEventListener('click', function() {
             if (camera) {
-                camera.position.z *= 1.2; // Daha hızlı zoom out
+                camera.position.z *= 1.2; 
                 camera.updateProjectionMatrix();
             }
         });
     }
 });
 
-// Harita yükleme fonksiyonu
+
 function loadMap(year) {
     const mapImage = document.querySelector('#map img');
     if (mapImage) {
@@ -297,14 +293,12 @@ function loadMap(year) {
     }
 }
 
-// Harita etkileşimini kurma
 function setupMapInteraction(year) {
     const mapContainer = document.querySelector('#map');
     const mapImage = mapContainer.querySelector('img');
 
     if (!mapContainer || !mapImage) return;
 
-    // Önceki event listener'ları temizle
     mapImage.replaceWith(mapImage.cloneNode(true));
     const newMapImage = mapContainer.querySelector('img');
 
@@ -358,7 +352,6 @@ function isPointInPolygon(x, y, vertices) {
     return inside;
 }
 
-// Devlet bilgilerini gösterme
 function showStateInfo(name, data) {
     const infoPanel = document.querySelector('.info-panel');
     const stateName = document.getElementById('stateName');
@@ -372,7 +365,6 @@ function showStateInfo(name, data) {
     }
 }
 
-// 3D viewer başlatma
 function init3DViewer() {
     const container = document.getElementById('model-viewer');
     
@@ -381,15 +373,13 @@ function init3DViewer() {
         return;
     }
 
-    // Scene oluştur
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x2a2a2a);
     
-    // Camera oluştur
     camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.z = 5; // Başlangıç zoom seviyesi
+    camera.position.z = 5; 
     
-    // Renderer oluştur
+    
     renderer = new THREE.WebGLRenderer({ 
         antialias: true,
         precision: 'highp',
@@ -397,38 +387,32 @@ function init3DViewer() {
     });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.physicallyCorrectLights = true; // Fiziksel ışık davranışı
+    renderer.physicallyCorrectLights = true; 
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
     
-    // Işıklandırma
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Ambient ışık arttırıldı
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); 
     scene.add(ambientLight);
     
-    // Ön ışık
     const frontLight = new THREE.DirectionalLight(0xffffff, 2);
     frontLight.position.set(0, 0, 5);
     scene.add(frontLight);
     
-    // Arka ışık
     const backLight = new THREE.DirectionalLight(0xffffff, 1.5);
     backLight.position.set(0, 0, -5);
     scene.add(backLight);
     
-    // Üst ışık
     const topLight = new THREE.DirectionalLight(0xffffff, 1.5);
     topLight.position.set(0, 5, 0);
     scene.add(topLight);
     
-    // Kontroller
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.enableZoom = true;
-    controls.autoRotate = true; // Otomatik döndürme
-    controls.autoRotateSpeed = 2; // Döndürme hızı
+    controls.autoRotate = true; 
+    controls.autoRotateSpeed = 2; 
     
-    // Animasyon döngüsü
     function animate() {
         requestAnimationFrame(animate);
         controls.update();
@@ -437,20 +421,20 @@ function init3DViewer() {
     animate();
 }
 
-// Model yükleme
+
 function loadModel(modelPath) {
     if (!scene) {
         console.error('Scene henüz oluşturulmadı');
         return;
     }
 
-    // Önce mevcut bilgi panelini temizle
+   
     const existingInfo = document.querySelector('.coin-info');
     if (existingInfo) {
         existingInfo.remove();
     }
 
-    // Sikke bilgilerini göster
+    
     const coinId = modelPath.split('/').pop().replace('.obj', '');
     if (coinInfo[coinId]) {
         const info = coinInfo[coinId];
@@ -459,7 +443,7 @@ function loadModel(modelPath) {
         
         let html = `<h3>${info.title}</h3><div class="coin-details">`;
 
-        // Fiziksel özellikler
+       
         if (info.details.physical) {
             const physical = info.details.physical;
             html += '<div class="physical-info"><h4>Fiziksel Özellikler</h4>';
@@ -471,7 +455,7 @@ function loadModel(modelPath) {
             html += '</div>';
         }
 
-        // Tarihsel bilgiler
+       
         if (info.details.historical) {
             const historical = info.details.historical;
             html += '<div class="historical-info"><h4>Tarihsel Bilgiler</h4>';
@@ -481,7 +465,7 @@ function loadModel(modelPath) {
             html += '</div>';
         }
 
-        // Yazılar ve tasvirler
+        
         if (info.details.inscriptions) {
             const inscriptions = info.details.inscriptions;
             html += '<div class="inscriptions"><h4>Tasvirler</h4>';
@@ -506,11 +490,11 @@ function loadModel(modelPath) {
         model = null;
     }
     
-    // Materyal ayarları güncellendi
+    
     const material = new THREE.MeshStandardMaterial({
-        color: 0xb87333, // Bakır rengi
-        metalness: 0.7,  // Metalik efekt azaltıldı
-        roughness: 0.2,  // Pürüzsüzlük arttırıldı
+        color: 0xb87333, 
+        metalness: 0.7,  
+        roughness: 0.2,  
         envMapIntensity: 1.0,
         flatShading: false
     });
@@ -539,7 +523,7 @@ function loadModel(modelPath) {
             
             scene.add(model);
             
-            // Kamerayı modele odakla
+            
             camera.lookAt(model.position);
         },
         undefined,
@@ -549,13 +533,13 @@ function loadModel(modelPath) {
     );
 }
 
-// Aktif yılı alma
+
 function getCurrentYear() {
     const activeButton = document.querySelector('.timeline-btn.active');
     return activeButton ? activeButton.dataset.year : '1100AD';
 }
 
-// Pencere boyutu değiştiğinde
+
 window.addEventListener('resize', function() {
     const container = document.getElementById('model-viewer');
     if (renderer && camera) {
