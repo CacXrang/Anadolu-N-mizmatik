@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İmparaTarih</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="logo">
+                <h1>İmpara<span>Tarih</span></h1>
+            </div>
+
+            <div class="timeline">
+                <button data-year="1100AD" class="timeline-btn">1100 MS</button>
+                <button data-year="1330AD" class="timeline-btn">1330 MS</button>
+                <button data-year="1600AD" class="timeline-btn">1600 MS</button>
+            </div>
+
+            <div class="info-box">
+                <h3>Dönem Özeti</h3>
+                <p>Bu dönemde Anadolu'da çeşitli medeniyetler hüküm sürmüştür. Seçilen bölgeye tıklayarak detaylı bilgi alabilirsiniz.</p>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="map-container">
+                <div id="map">
+                    <img src="maps/1100AD.png" alt="Historical Map" style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <span class="info-close">&times;</span>
+                <h2 id="stateName"></h2>
+                <iframe id="wikiFrame" src="about:blank"></iframe>
+                <button id="view3DButton">Parayı 3D Görüntüle</button>
+            </div>
+        </div>
+
+        <div id="modelModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div class="model-container">
+                    <div id="model-viewer"></div>
+                    <div class="zoom-controls">
+                        <button id="zoomIn" class="zoom-btn"><i class="fas fa-plus"></i></button>
+                        <button id="zoomOut" class="zoom-btn"><i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="coin-info"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
